@@ -3,12 +3,42 @@
     x:Class="MealWise.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:MealWise"
-    Title="MealWise">
+    xmlns:views="clr-namespace:MealWise.Views"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.TabBarBackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+    Shell.TabBarTitleColor="#2B8A3E"
+    Shell.TabBarUnselectedColor="#8E8E93"
+    Shell.TabBarForegroundColor="#2B8A3E">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <!-- Нижнє меню з 4 вкладками -->
+    <TabBar>
+        <Tab Title="Profile">
+            <ShellContent
+                Title="Profile"
+                ContentTemplate="{DataTemplate views:ProfilePage}"
+                Route="ProfilePage" />
+        </Tab>
+
+        <Tab Title="Pantry">
+            <ShellContent
+                Title="Pantry"
+                ContentTemplate="{DataTemplate views:PantryPage}"
+                Route="PantryPage" />
+        </Tab>
+
+        <Tab Title="Diary">
+            <ShellContent
+                Title="Diary"
+                ContentTemplate="{DataTemplate views:DiaryPage}"
+                Route="DiaryPage" />
+        </Tab>
+
+        <Tab Title="Recipe">
+            <ShellContent
+                Title="Recipe"
+                ContentTemplate="{DataTemplate views:RecipePage}"
+                Route="RecipePage" />
+        </Tab>
+    </TabBar>
 
 </Shell>
