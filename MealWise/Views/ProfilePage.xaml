@@ -1,9 +1,253 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MealWise.ViewModels"
+             xmlns:converters="clr-namespace:MealWise.Converters"
              x:Class="MealWise.Views.ProfilePage"
-             Title="Profile and Targets">
-    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-        <Label Text="Tab 1: Profile and Targets Page" FontSize="18" />
-    </VerticalStackLayout>
+             x:DataType="vm:ProfileViewModel"
+             BackgroundColor="#0E211F"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+
+            <Color x:Key="BgColor">#0E211F</Color>
+            <Color x:Key="Surface2Color">#1C3A34</Color>
+            <Color x:Key="AccentColor">#C8FF4D</Color>
+            <Color x:Key="AccentSoftColor">#233B26</Color>
+            <Color x:Key="TextMutedColor">#93A8A1</Color>
+            <Color x:Key="StrokeColor">#2A473F</Color>
+            <Color x:Key="TextColor">#F3F7F3</Color>
+
+            <Style x:Key="FieldBorderStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource Surface2Color}"/>
+                <Setter Property="Stroke" Value="{StaticResource StrokeColor}"/>
+                <Setter Property="StrokeThickness" Value="1"/>
+                <Setter Property="StrokeShape" Value="RoundRectangle 14"/>
+                <Setter Property="Padding" Value="12,6"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView VerticalScrollBarVisibility="Never">
+        <VerticalStackLayout Padding="20,16,20,24" Spacing="12">
+
+
+            <!-- Headings & Save Button Header Row -->
+            <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center" Margin="0,10,0,0">
+                <Label Grid.Column="0"
+                       Text="Let's get to know you"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextColor}"
+                       VerticalOptions="Center"
+                       LineHeight="1.15"/>
+
+               
+                <Button Grid.Column="1"
+                        Text="Save"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="{StaticResource AccentColor}"
+                        TextColor="#0E211F"
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        CornerRadius="12"
+                        HeightRequest="36"
+                        Padding="16,0"
+                        VerticalOptions="Center"/>
+            </Grid>
+            <!-- Form Fields -->
+            <VerticalStackLayout Spacing="10">
+
+                <!-- Date of Birth -->
+                <Border Style="{StaticResource FieldBorderStyle}">
+                    <VerticalStackLayout>
+                        <Label Text="DATE OF BIRTH" FontSize="9" FontAttributes="Bold" TextColor="{StaticResource TextMutedColor}"/>
+                        <DatePicker Date="{Binding DateOfBirth}" TextColor="{StaticResource TextColor}" FontSize="14" Format="dd.MM.yyyy"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Gender Segmented Control -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="GENDER" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource TextMutedColor}"/>
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+
+                        <Border Grid.Column="0"
+                                StrokeShape="RoundRectangle 14"
+                                Padding="8,10"
+                                BackgroundColor="{Binding IsMaleSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#1C3A34'}"
+                                Stroke="{Binding IsMaleSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#2A473F'}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectGenderCommand}" CommandParameter="Male"/>
+                            </Border.GestureRecognizers>
+                            <Label Text="Male" HorizontalOptions="Center" FontAttributes="Bold" FontSize="13"
+                                   TextColor="{Binding IsMaleSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0E211F|#93A8A1'}"/>
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 14"
+                                Padding="8,10"
+                                BackgroundColor="{Binding IsFemaleSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#1C3A34'}"
+                                Stroke="{Binding IsFemaleSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#2A473F'}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectGenderCommand}" CommandParameter="Female"/>
+                            </Border.GestureRecognizers>
+                            <Label Text="Female" HorizontalOptions="Center" FontAttributes="Bold" FontSize="13"
+                                   TextColor="{Binding IsFemaleSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0E211F|#93A8A1'}"/>
+                        </Border>
+
+                        <Border Grid.Column="2"
+                                StrokeShape="RoundRectangle 14"
+                                Padding="8,10"
+                                BackgroundColor="{Binding IsOtherSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#1C3A34'}"
+                                Stroke="{Binding IsOtherSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#2A473F'}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectGenderCommand}" CommandParameter="Other"/>
+                            </Border.GestureRecognizers>
+                            <Label Text="Other" HorizontalOptions="Center" FontAttributes="Bold" FontSize="13"
+                                   TextColor="{Binding IsOtherSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0E211F|#93A8A1'}"/>
+                        </Border>
+
+                    </Grid>
+                </VerticalStackLayout>
+
+                <!-- Height & Weight -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Border Grid.Column="0" Style="{StaticResource FieldBorderStyle}">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="HEIGHT" FontSize="9" FontAttributes="Bold" TextColor="{StaticResource TextMutedColor}"/>
+                                <Entry Text="{Binding HeightCm}" Keyboard="Numeric" TextColor="{StaticResource TextColor}" FontSize="14" Margin="0,-4,0,0"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="cm" TextColor="{StaticResource TextMutedColor}" VerticalOptions="Center" FontSize="13" FontAttributes="Bold"/>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource FieldBorderStyle}">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="WEIGHT" FontSize="9" FontAttributes="Bold" TextColor="{StaticResource TextMutedColor}"/>
+                                <Entry Text="{Binding WeightKg}" Keyboard="Numeric" TextColor="{StaticResource TextColor}" FontSize="14" Margin="0,-4,0,0"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="kg" TextColor="{StaticResource TextMutedColor}" VerticalOptions="Center" FontSize="13" FontAttributes="Bold"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- BMI Card -->
+                <Border IsVisible="{Binding HasBmi}"
+                        BackgroundColor="{StaticResource AccentSoftColor}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="14,10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="BODY MASS INDEX" FontSize="10" FontAttributes="Bold" TextColor="#A9C98F" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Text="{Binding Bmi, StringFormat='{0:F1}'}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource AccentColor}" VerticalOptions="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- Dietary Restrictions / Allergies (Поле для AI) -->
+                <Border Style="{StaticResource FieldBorderStyle}">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="DIETARY RESTRICTIONS / ALLERGIES" FontSize="9" FontAttributes="Bold" TextColor="{StaticResource TextMutedColor}"/>
+                        <Entry Text="{Binding DietaryRestrictions}"
+                               Placeholder="e.g. Vegan, allergic to peanuts, lactose intolerant"
+                               PlaceholderColor="#5A756C"
+                               TextColor="{StaticResource TextColor}"
+                               FontSize="13"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Activity Level Grid (5 рівня) -->
+                <VerticalStackLayout Spacing="6" Margin="0,4,0,0">
+                    <Label Text="ACTIVITY LEVEL" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource TextMutedColor}"/>
+
+                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,*" RowSpacing="8" ColumnSpacing="8">
+
+                        <!-- 1. Sedentary -->
+                        <Border Grid.Row="0" Grid.Column="0"
+                                StrokeShape="RoundRectangle 14" Padding="12,10"
+                                BackgroundColor="{Binding IsSedentarySelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#233B26|#1C3A34'}"
+                                Stroke="{Binding IsSedentarySelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#2A473F'}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectActivityLevelCommand}" CommandParameter="Sedentary"/>
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout>
+                                <Label Text="Sedentary" FontAttributes="Bold" FontSize="12" TextColor="{Binding IsSedentarySelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#F3F7F3'}"/>
+                                <Label Text="Little to no exercise" FontSize="10" TextColor="{StaticResource TextMutedColor}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- 2. Light -->
+                        <Border Grid.Row="0" Grid.Column="1"
+                                StrokeShape="RoundRectangle 14" Padding="12,10"
+                                BackgroundColor="{Binding IsLightSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#233B26|#1C3A34'}"
+                                Stroke="{Binding IsLightSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#2A473F'}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectActivityLevelCommand}" CommandParameter="Light"/>
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout>
+                                <Label Text="Light" FontAttributes="Bold" FontSize="12" TextColor="{Binding IsLightSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#F3F7F3'}"/>
+                                <Label Text="1–3 days / week" FontSize="10" TextColor="{StaticResource TextMutedColor}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- 3. Moderate -->
+                        <Border Grid.Row="1" Grid.Column="0"
+                                StrokeShape="RoundRectangle 14" Padding="12,10"
+                                BackgroundColor="{Binding IsModerateSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#233B26|#1C3A34'}"
+                                Stroke="{Binding IsModerateSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#2A473F'}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectActivityLevelCommand}" CommandParameter="Moderate"/>
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout>
+                                <Label Text="Moderate" FontAttributes="Bold" FontSize="12" TextColor="{Binding IsModerateSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#F3F7F3'}"/>
+                                <Label Text="3–5 days / week" FontSize="10" TextColor="{StaticResource TextMutedColor}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- 4. Active -->
+                        <Border Grid.Row="1" Grid.Column="1"
+                                StrokeShape="RoundRectangle 14" Padding="12,10"
+                                BackgroundColor="{Binding IsActiveSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#233B26|#1C3A34'}"
+                                Stroke="{Binding IsActiveSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#2A473F'}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectActivityLevelCommand}" CommandParameter="Active"/>
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout>
+                                <Label Text="Active" FontAttributes="Bold" FontSize="12" TextColor="{Binding IsActiveSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#F3F7F3'}"/>
+                                <Label Text="6–7 days / week" FontSize="10" TextColor="{StaticResource TextMutedColor}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- 5. Very Active (займає 2 колонки) -->
+                        <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                StrokeShape="RoundRectangle 14" Padding="12,10"
+                                BackgroundColor="{Binding IsVeryActiveSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#233B26|#1C3A34'}"
+                                Stroke="{Binding IsVeryActiveSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#2A473F'}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectActivityLevelCommand}" CommandParameter="VeryActive"/>
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout>
+                                <Label Text="Very Active" FontAttributes="Bold" FontSize="12" TextColor="{Binding IsVeryActiveSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#C8FF4D|#F3F7F3'}"/>
+                                <Label Text="Very heavy exercise or physical job" FontSize="10" TextColor="{StaticResource TextMutedColor}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </Grid>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+
+
+            <!-- Caption -->
+            <Label Text="Your info is only used to build your personal plan"
+                   HorizontalOptions="Center"
+                   FontSize="11"
+                   TextColor="{StaticResource TextMutedColor}"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
 </ContentPage>

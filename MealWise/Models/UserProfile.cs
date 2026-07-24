@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿using MealWise;
+using MealWise.Models;
 namespace MealWise.Models;
 
 public class UserProfile

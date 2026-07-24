@@ -1,9 +1,256 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MealWise.ViewModels"
+             xmlns:models="clr-namespace:MealWise.Models"
              x:Class="MealWise.Views.DiaryPage"
-             Title="Food Diary">
-    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-        <Label Text="Tab 3: Food Diary and Analytics" FontSize="18" />
-    </VerticalStackLayout>
+             x:DataType="vm:DiaryViewModel"
+             BackgroundColor="#0A110E"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="BgColor">#0A110E</Color>
+            <Color x:Key="CardBgColor">#13231C</Color>
+            <Color x:Key="BorderColor">#1D362B</Color>
+            <Color x:Key="AccentColor">#C4F729</Color>
+            <Color x:Key="TextMutedColor">#8C9F97</Color>
+            <Color x:Key="TextColor">#FFFFFF</Color>
+
+            <Color x:Key="ProteinColor">#FB923C</Color>
+            <Color x:Key="CarbsColor">#60A5FA</Color>
+            <Color x:Key="FatColor">#C084FC</Color>
+
+            <Style x:Key="CardBorderStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource CardBgColor}"/>
+                <Setter Property="Stroke" Value="{StaticResource BorderColor}"/>
+                <Setter Property="StrokeThickness" Value="1"/>
+                <Setter Property="StrokeShape" Value="RoundRectangle 20"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Top Bar -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="20,16,20,10">
+            <ImageButton Grid.Column="0" Source="icon_menu.png" HeightRequest="24" WidthRequest="24" VerticalOptions="Center"/>
+            <HorizontalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="6" VerticalOptions="Center">
+                <Label Text="{Binding SelectedDateText, FallbackValue='Today', TargetNullValue='Today'}" 
+                       FontAttributes="Bold" 
+                       FontSize="16" 
+                       TextColor="{StaticResource TextColor}"/>
+                <Label Text="▼" FontSize="10" TextColor="{StaticResource TextColor}" VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+            <ImageButton Grid.Column="2" Source="icon_calendar.png" HeightRequest="22" WidthRequest="22" VerticalOptions="Center"/>
+        </Grid>
+
+        <!-- Main Content -->
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <VerticalStackLayout Padding="20,10,20,20" Spacing="20">
+
+                <!-- Daily Nutrition Card -->
+                <Border Style="{StaticResource CardBorderStyle}" Padding="18">
+                    <VerticalStackLayout Spacing="16">
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="Daily nutrition" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                                <Label Text="Overview of your intake" FontSize="12" TextColor="{StaticResource TextMutedColor}"/>
+                            </VerticalStackLayout>
+
+                            <!-- Circular Progress / Percentage Badge -->
+                            <Border Grid.Column="1" StrokeShape="RoundRectangle 30" HeightRequest="56" WidthRequest="56"
+                                    BackgroundColor="#1A2F26" Stroke="{StaticResource AccentColor}" StrokeThickness="3">
+                                <Label Text="{Binding TotalProgressPercentage, StringFormat='{0}%'}" 
+                                       HorizontalOptions="Center" VerticalOptions="Center" 
+                                       FontAttributes="Bold" FontSize="12" TextColor="{StaticResource TextColor}"/>
+                            </Border>
+                        </Grid>
+
+                        <!-- Macro Bars -->
+                        <VerticalStackLayout Spacing="12">
+
+                            <!-- Calories -->
+                            <VerticalStackLayout Spacing="4">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="Calories" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                                    <Label Grid.Column="1" FontSize="11" TextColor="{StaticResource TextMutedColor}">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0} / {1} kcal">
+                                                <Binding Path="CaloriesCurrent" />
+                                                <Binding Path="CaloriesGoal" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
+                                </Grid>
+                                <ProgressBar Progress="{Binding CaloriesProgress}" ProgressColor="{StaticResource AccentColor}" HeightRequest="6"/>
+                            </VerticalStackLayout>
+
+                            <!-- Protein -->
+                            <VerticalStackLayout Spacing="4">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="Protein" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                                    <Label Grid.Column="1" FontSize="11" TextColor="{StaticResource TextMutedColor}">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0} / {1} g">
+                                                <Binding Path="ProteinCurrent" />
+                                                <Binding Path="ProteinGoal" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
+                                </Grid>
+                                <ProgressBar Progress="{Binding ProteinProgress}" ProgressColor="{StaticResource ProteinColor}" HeightRequest="6"/>
+                            </VerticalStackLayout>
+
+                            <!-- Carbs -->
+                            <VerticalStackLayout Spacing="4">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="Carbs" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                                    <Label Grid.Column="1" FontSize="11" TextColor="{StaticResource TextMutedColor}">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0} / {1} g">
+                                                <Binding Path="CarbsCurrent" />
+                                                <Binding Path="CarbsGoal" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
+                                </Grid>
+                                <ProgressBar Progress="{Binding CarbsProgress}" ProgressColor="{StaticResource CarbsColor}" HeightRequest="6"/>
+                            </VerticalStackLayout>
+
+                            <!-- Fat -->
+                            <VerticalStackLayout Spacing="4">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="Fat" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                                    <Label Grid.Column="1" FontSize="11" TextColor="{StaticResource TextMutedColor}">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0} / {1} g">
+                                                <Binding Path="FatCurrent" />
+                                                <Binding Path="FatGoal" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
+                                </Grid>
+                                <ProgressBar Progress="{Binding FatProgress}" ProgressColor="{StaticResource FatColor}" HeightRequest="6"/>
+                            </VerticalStackLayout>
+
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Update Meal Actions -->
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Update meal" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+
+                        <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Padding="12">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding AddWeightCommand}"/>
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                                <Image Source="icon_weight.png" HeightRequest="22" WidthRequest="22"/>
+                                <Label Text="Weight" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- PHOTO BUTTON (Камера / Галерея) -->
+                        <Border Grid.Column="1" Style="{StaticResource CardBorderStyle}" Padding="12">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectPhotoSourceCommand}"/>
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                                <Image Source="icon_camera.png" HeightRequest="22" WidthRequest="22"/>
+                                <Label Text="Photo" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource AccentColor}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border Grid.Column="2" Style="{StaticResource CardBorderStyle}" Padding="12">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding AddTextCommand}"/>
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                                <Image Source="icon_text.png" HeightRequest="22" WidthRequest="22"/>
+                                <Label Text="Text" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </Grid>
+                </VerticalStackLayout>
+
+                <!-- AI Recognition & Photo Preview Module -->
+                <Border Style="{StaticResource CardBorderStyle}" Padding="16" IsVisible="{Binding HasSelectedImage}">
+                    <VerticalStackLayout Spacing="12">
+
+                        <!-- Статус аналізу -->
+                        <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                            <ActivityIndicator IsRunning="{Binding IsAnalyzing}" IsVisible="{Binding IsAnalyzing}" Color="{StaticResource AccentColor}" HeightRequest="16" WidthRequest="16"/>
+                            <Label Text="{Binding StatusText}" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextMutedColor}" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+
+                        <!-- ПЕРЕГЛЯД ЗОБРАЖЕННЯ ТА НАЗВИ -->
+                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="12" BackgroundColor="#0A110E" Padding="8">
+                            <Border StrokeShape="RoundRectangle 10" HeightRequest="60" WidthRequest="60">
+                                <!-- Зв'язане фото -->
+                                <Image Source="{Binding SelectedImageSource}" Aspect="AspectFill"/>
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                <Label Text="{Binding RecognizedFoodName}" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                                <Label Text="{Binding RecognizedCalories, StringFormat='{0} kcal'}" FontSize="12" TextColor="{StaticResource TextMutedColor}"/>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Кнопки підтвердження / редагування -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Button Grid.Column="0" Text="Confirm" Command="{Binding ConfirmMealCommand}"
+                                    BackgroundColor="{StaticResource AccentColor}" TextColor="#0B1612" FontAttributes="Bold" CornerRadius="12"/>
+                            <Button Grid.Column="1" Text="Retake / Edit" Command="{Binding SelectPhotoSourceCommand}"
+                                    BackgroundColor="#1A2F26" TextColor="{StaticResource TextColor}" BorderColor="{StaticResource BorderColor}" BorderWidth="1" FontAttributes="Bold" CornerRadius="12"/>
+                        </Grid>
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Today's Logs -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="TODAY'S LOG" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextMutedColor}"/>
+
+                    <BindableLayout.ItemsSource>
+                        <Binding Path="TodayLogs" />
+                    </BindableLayout.ItemsSource>
+
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:MealLogItem">
+                            <Border Style="{StaticResource CardBorderStyle}" Padding="12,10" Margin="0,2">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+                                        <Label Text="•" TextColor="{StaticResource AccentColor}" FontSize="16" VerticalOptions="Center"/>
+                                        <Label Text="{Binding MealType}" FontAttributes="Bold" FontSize="13" TextColor="{StaticResource TextColor}"/>
+                                        <Label Text="·" TextColor="{StaticResource TextMutedColor}"/>
+                                        <Label Text="{Binding Name}" FontSize="13" TextColor="{StaticResource TextMutedColor}"/>
+                                    </HorizontalStackLayout>
+                                    <Label Grid.Column="1" Text="{Binding Calories, StringFormat='{0} kcal'}" FontSize="12" TextColor="{StaticResource TextMutedColor}" VerticalOptions="Center"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Save Button Footer -->
+        <Border Grid.Row="2" BackgroundColor="#0A110E" Padding="20,12,20,20" StrokeThickness="0">
+            <Button Text="Save to today's diary" 
+                    Command="{Binding SaveToDiaryCommand}"
+                    BackgroundColor="{StaticResource AccentColor}" 
+                    TextColor="#0B1612" 
+                    FontSize="15" 
+                    FontAttributes="Bold" 
+                    CornerRadius="16" 
+                    HeightRequest="52"/>
+        </Border>
+
+    </Grid>
 </ContentPage>
