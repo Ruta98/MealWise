@@ -15,6 +15,9 @@ public class PantryItem
     public Unit Unit { get; set; } = Unit.Grams;
     public DateTime AddedDate { get; set; } = DateTime.Now;
 
+    // Category field for smart AI filtering and UI grouping
+    public ProductCategory Category { get; set; } = ProductCategory.Produce;
+
     // --- SQLite Flat Columns ---
     public double Calories { get; set; }
     public double ProteinGrams { get; set; }

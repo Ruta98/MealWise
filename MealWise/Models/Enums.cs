@@ -26,3 +26,37 @@ public enum Unit
     Milliliters, // "ml"
     Pieces       // "pcs"
 }
+
+public enum ProductCategory
+{
+    // --- BASIC & COOKING INGREDIENTS ---
+
+    /// <summary> Fresh meat, poultry, and fish </summary>
+    MeatAndSeafood = 1,
+
+    /// <summary> Eggs, cottage cheese, milk, cheese, yogurts </summary>
+    DairyAndEggs = 2,
+
+    /// <summary> Fresh vegetables, greens, mushrooms, and fruits </summary>
+    Produce = 3,
+
+    /// <summary> Grains, pasta, flour, bread, legumes </summary>
+    GrainsAndCarbs = 4,
+
+    /// <summary> Oils, nuts, seeds, butter, spices, sauces, condiments </summary>
+    FatsAndCondiments = 5,
+
+    // --- PROCESSED, SNACKS & CONVENIENCE ---
+
+    /// <summary> Chips, crackers, chocolate, cookies, sweets </summary>
+    SweetsAndSnacks = 6,
+
+    /// <summary> Frozen dumplings, nuggets, semi-finished products </summary>
+    FrozenAndConvenience = 7,
+
+    /// <summary> Fast food, takeout meals, deli dishes </summary>
+    PreparedFood = 8,
+
+    /// <summary> Sodas, juices, alcohol, sweet drinks </summary>
+    Beverages = 9
+}
