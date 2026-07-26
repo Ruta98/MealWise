@@ -1,9 +1,206 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MealWise.ViewModels"
+             xmlns:models="clr-namespace:MealWise.Models"
              x:Class="MealWise.Views.PantryPage"
-             Title="My Pantry">
-    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-        <Label Text="Tab 2: Pantry Management" FontSize="18" />
-    </VerticalStackLayout>
+             x:DataType="vm:PantryViewModel"
+             BackgroundColor="#0A110E"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Кольорова палітра згідно з дизайном -->
+            <Color x:Key="BgColor">#0A110E</Color>
+            <Color x:Key="CardBgColor">#13231C</Color>
+            <Color x:Key="BorderColor">#1D362B</Color>
+            <Color x:Key="AccentColor">#C8FF4D</Color>
+            <Color x:Key="TextMutedColor">#8C9F97</Color>
+            <Color x:Key="TextColor">#FFFFFF</Color>
+
+            <!-- Базовий стиль для карток -->
+            <Style x:Key="CardBorderStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource CardBgColor}"/>
+                <Setter Property="Stroke" Value="{StaticResource BorderColor}"/>
+                <Setter Property="StrokeThickness" Value="1"/>
+                <Setter Property="StrokeShape" Value="RoundRectangle 20"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto, *, Auto">
+
+        <!-- Top Header & Back Button -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,16,20,12" Spacing="12">
+            <!-- Back Button -->
+            <Border WidthRequest="38"
+                    HeightRequest="38"
+                    HorizontalOptions="Start"
+                    BackgroundColor="#1C3A34"
+                    Stroke="#2A473F"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 12">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding BackCommand}"/>
+                </Border.GestureRecognizers>
+                <Label Text="‹"
+                       TextColor="#F3F7F3"
+                       FontSize="24"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       Margin="0,-3,0,0"/>
+            </Border>
+
+            <!-- Titles -->
+            <Label Text="Update ingredients"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource TextColor}"/>
+
+            <Label Text="Add what's in your kitchen so we can tailor your plan."
+                   FontSize="12.5"
+                   TextColor="{StaticResource TextMutedColor}"
+                   Margin="0,-4,0,0"/>
+        </VerticalStackLayout>
+
+        <!-- Main Scrollable Content -->
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <VerticalStackLayout Padding="20,8,20,20" Spacing="16">
+
+                <!-- Action Cards: Take Photo / Type It In -->
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="12">
+
+                    <!-- 1. Take a Photo -->
+                    <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Padding="16">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding TakePhotoCommand}"/>
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="8">
+                            <Border WidthRequest="36" HeightRequest="36" 
+                                    BackgroundColor="#1C3A34" Stroke="Transparent" 
+                                    StrokeShape="RoundRectangle 10" HorizontalOptions="Start">
+                                <Label Text="📷" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Border>
+                            <Label Text="Take a photo" FontAttributes="Bold" FontSize="14" TextColor="{StaticResource TextColor}"/>
+                            <Label Text="Snap your fridge or pantry" FontSize="11" TextColor="{StaticResource TextMutedColor}"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- 2. Type It In -->
+                    <Border Grid.Column="1" Style="{StaticResource CardBorderStyle}" Padding="16">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding TypeInputCommand}"/>
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="8">
+                            <Border WidthRequest="36" HeightRequest="36" 
+                                    BackgroundColor="#1C3A34" Stroke="Transparent" 
+                                    StrokeShape="RoundRectangle 10" HorizontalOptions="Start">
+                                <Label Text="✏️" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Border>
+                            <Label Text="Type it in" FontAttributes="Bold" FontSize="14" TextColor="{StaticResource TextColor}"/>
+                            <Label Text="List ingredients by hand" FontSize="11" TextColor="{StaticResource TextMutedColor}"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                </Grid>
+
+                <!-- AI Processing State Card -->
+                <Border Style="{StaticResource CardBorderStyle}" 
+                        Padding="16" 
+                        IsVisible="{Binding IsInterpreting}">
+                    <Grid ColumnDefinitions="Auto, *" ColumnSpacing="14" VerticalOptions="Center">
+                        <ActivityIndicator Grid.Column="0" 
+                                           IsRunning="{Binding IsInterpreting}" 
+                                           Color="{StaticResource AccentColor}" 
+                                           HeightRequest="28" 
+                                           WidthRequest="28" 
+                                           VerticalOptions="Center"/>
+
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="{Binding StatusTitle, FallbackValue='Interpreting your input'}" 
+                                   FontAttributes="Bold" 
+                                   FontSize="13.5" 
+                                   TextColor="{StaticResource TextColor}"/>
+                            <Label Text="{Binding StatusSubtitle, FallbackValue='We\'ll turn this into ingredients automatically'}" 
+                                   FontSize="11" 
+                                   TextColor="{StaticResource TextMutedColor}"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Ingredients Section Header -->
+                <Label Text="YOUR INGREDIENTS" 
+                       FontSize="11" 
+                       FontAttributes="Bold" 
+                       TextColor="{StaticResource TextMutedColor}" 
+                       CharacterSpacing="0.8" 
+                       Margin="0,4,0,-4"/>
+
+                <!-- Dynamic Ingredients List -->
+                <VerticalStackLayout Spacing="10">
+                    <BindableLayout.ItemsSource>
+                        <Binding Path="PantryItems" />
+                    </BindableLayout.ItemsSource>
+
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:PantryItem">
+                            <Border Style="{StaticResource CardBorderStyle}" Padding="14,12">
+                                <Grid ColumnDefinitions="Auto, *, Auto, Auto" ColumnSpacing="12" VerticalOptions="Center">
+
+                                    <!-- Emoji / Category Icon -->
+                                    <Label Grid.Column="0" 
+                                           Text="{Binding Icon, FallbackValue='🥑'}" 
+                                           FontSize="18" 
+                                           VerticalOptions="Center"/>
+
+                                    <!-- Ingredient Name -->
+                                    <Label Grid.Column="1" 
+                                           Text="{Binding Name}" 
+                                           FontAttributes="Bold" 
+                                           FontSize="14" 
+                                           TextColor="{StaticResource TextColor}" 
+                                           VerticalOptions="Center"/>
+
+                                    <!-- Quantity & Unit -->
+                                    <HorizontalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center">
+                                        <Label Text="{Binding QuantityAmount}" 
+                                               FontSize="12.5" 
+                                               TextColor="{StaticResource TextMutedColor}"/>
+                                        <Label Text="{Binding Unit}" 
+                                               FontSize="12.5" 
+                                               TextColor="{StaticResource TextMutedColor}"/>
+                                    </HorizontalStackLayout>
+
+                                    <!-- Remove Action -->
+                                    <ImageButton Grid.Column="3" 
+                                                 Source="icon_close.png"
+                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PantryViewModel}}, Path=RemoveItemCommand}"
+                                                 CommandParameter="{Binding .}"
+                                                 HeightRequest="18" 
+                                                 WidthRequest="18" 
+                                                 VerticalOptions="Center"
+                                                 Opacity="0.6"/>
+
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Save Button Footer -->
+        <Border Grid.Row="2" BackgroundColor="#0A110E" Padding="20,12,20,24" StrokeThickness="0">
+            <Button Text="Save to my kitchen"
+                    Command="{Binding SaveToKitchenCommand}"
+                    BackgroundColor="{StaticResource AccentColor}"
+                    TextColor="#0E211F"
+                    FontSize="15"
+                    FontAttributes="Bold"
+                    CornerRadius="16"
+                    HeightRequest="52"/>
+        </Border>
+
+    </Grid>
 </ContentPage>

@@ -1,9 +1,225 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MealWise.ViewModels"
              x:Class="MealWise.Views.RecipePage"
-             Title="AI Chef Recipes">
-    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-        <Label Text="Tab 4: AI Recipe Generator" FontSize="18" />
-    </VerticalStackLayout>
+             x:DataType="vm:RecipeViewModel"
+             BackgroundColor="#0A110E"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Кольори тематики -->
+            <Color x:Key="BgColor">#0A110E</Color>
+            <Color x:Key="CardBgColor">#13231C</Color>
+            <Color x:Key="BorderColor">#1D362B</Color>
+            <Color x:Key="AccentColor">#C8FF4D</Color>
+            <Color x:Key="AccentSoftColor">#1A3326</Color>
+            <Color x:Key="TextMutedColor">#8C9F97</Color>
+            <Color x:Key="TextColor">#FFFFFF</Color>
+
+            <!-- Стиль для карток -->
+            <Style x:Key="CardBorderStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource CardBgColor}"/>
+                <Setter Property="Stroke" Value="{StaticResource BorderColor}"/>
+                <Setter Property="StrokeThickness" Value="1"/>
+                <Setter Property="StrokeShape" Value="RoundRectangle 20"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto, *, Auto">
+
+        <!-- Top Navigation & Header -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,16,20,12" Spacing="12">
+            <!-- Back Button -->
+            <Border WidthRequest="38"
+                    HeightRequest="38"
+                    HorizontalOptions="Start"
+                    BackgroundColor="#1C3A34"
+                    Stroke="#2A473F"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 12">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding BackCommand}"/>
+                </Border.GestureRecognizers>
+                <Label Text="‹"
+                       TextColor="{StaticResource TextColor}"
+                       FontSize="24"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       Margin="0,-3,0,0"/>
+            </Border>
+
+            <!-- Title & Subtitle -->
+            <Label Text="Suggested recipes"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource TextColor}"/>
+
+            <Label Text="Made from what's already in your kitchen"
+                   FontSize="12.5"
+                   TextColor="{StaticResource TextMutedColor}"
+                   Margin="0,-4,0,0"/>
+        </VerticalStackLayout>
+
+        <!-- Main Scrollable List -->
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <VerticalStackLayout Padding="20,4,20,20" Spacing="16">
+
+                <!-- AI Ingredient Summary Badge Card -->
+                <Border BackgroundColor="{StaticResource AccentSoftColor}" 
+                        Stroke="{StaticResource BorderColor}" 
+                        StrokeThickness="1" 
+                        StrokeShape="RoundRectangle 16" 
+                        Padding="14,12">
+                    <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                        <Label Text="✨" FontSize="15" VerticalOptions="Center"/>
+                        <Label Text="{Binding SummaryText, FallbackValue='Generated from 8 ingredients you have'}" 
+                               FontSize="13" 
+                               FontAttributes="Bold" 
+                               TextColor="{StaticResource AccentColor}" 
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </Border>
+
+                <!-- Recipes List -->
+                <VerticalStackLayout Spacing="10">
+                    <BindableLayout.ItemsSource>
+                        <Binding Path="SuggestedRecipes" />
+                    </BindableLayout.ItemsSource>
+
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:RecipeSuggestionItem">
+                            <Border Style="{StaticResource CardBorderStyle}" Padding="14,12">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:RecipeViewModel}}, Path=SelectRecipeCommand}"
+                                                         CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="12" VerticalOptions="Center">
+
+                                    <!-- Dish Category Icon -->
+                                    <Border Grid.Column="0" 
+                                            WidthRequest="44" 
+                                            HeightRequest="44" 
+                                            BackgroundColor="#1A2F26" 
+                                            Stroke="Transparent" 
+                                            StrokeShape="RoundRectangle 12">
+                                        <Label Text="{Binding Icon, FallbackValue='🍲'}" 
+                                               FontSize="20" 
+                                               HorizontalOptions="Center" 
+                                               VerticalOptions="Center"/>
+                                    </Border>
+
+                                    <!-- Title & Details -->
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding Title}" 
+                                               FontAttributes="Bold" 
+                                               FontSize="14" 
+                                               TextColor="{StaticResource TextColor}"/>
+
+                                        <HorizontalStackLayout Spacing="4">
+                                            <Label Text="{Binding CookingTimeMinutes, StringFormat='{0} min'}" 
+                                                   FontSize="12" 
+                                                   TextColor="{StaticResource TextMutedColor}"/>
+                                            <Label Text="·" FontSize="12" TextColor="{StaticResource TextMutedColor}"/>
+                                            <Label Text="{Binding IngredientsCount, StringFormat='{0} ingredients'}" 
+                                                   FontSize="12" 
+                                                   TextColor="{StaticResource TextMutedColor}"/>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+
+                                    <!-- Match Percentage Badge -->
+                                    <Border Grid.Column="2" 
+                                            BackgroundColor="{StaticResource AccentColor}" 
+                                            StrokeShape="RoundRectangle 10" 
+                                            Padding="10,6" 
+                                            VerticalOptions="Center">
+                                        <Label Text="{Binding MatchPercentage, StringFormat='{0}%'}" 
+                                               FontAttributes="Bold" 
+                                               FontSize="12" 
+                                               TextColor="#0E211F" 
+                                               HorizontalOptions="Center"/>
+                                    </Border>
+
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <!-- Missing Ingredients Section -->
+                <VerticalStackLayout Spacing="10" Margin="0,8,0,0">
+                    <Label Text="MISSING FOR THESE RECIPES" 
+                           FontSize="11" 
+                           FontAttributes="Bold" 
+                           TextColor="{StaticResource TextMutedColor}" 
+                           CharacterSpacing="0.8"/>
+
+                    <BindableLayout.ItemsSource>
+                        <Binding Path="MissingIngredients" />
+                    </BindableLayout.ItemsSource>
+
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:MissingIngredientItem">
+                            <Border Style="{StaticResource CardBorderStyle}" Padding="14,12">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:RecipeViewModel}}, Path=ToggleMissingItemCommand}"
+                                                         CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="12" VerticalOptions="Center">
+
+                                    <!-- Radio/Checkbox Circle -->
+                                    <Border Grid.Column="0" 
+                                            WidthRequest="20" 
+                                            HeightRequest="20" 
+                                            BackgroundColor="Transparent" 
+                                            Stroke="{StaticResource TextMutedColor}" 
+                                            StrokeThickness="1.5" 
+                                            StrokeShape="RoundRectangle 10" 
+                                            VerticalOptions="Center">
+                                        <BoxView IsVisible="{Binding IsSelected}" 
+                                                 Color="{StaticResource AccentColor}" 
+                                                 CornerRadius="5" 
+                                                 Margin="3"/>
+                                    </Border>
+
+                                    <!-- Ingredient Name -->
+                                    <Label Grid.Column="1" 
+                                           Text="{Binding Name}" 
+                                           FontAttributes="Bold" 
+                                           FontSize="13.5" 
+                                           TextColor="{StaticResource TextColor}" 
+                                           VerticalOptions="Center"/>
+
+                                    <!-- Add Plus Action -->
+                                    <Label Grid.Column="2" 
+                                           Text="+" 
+                                           FontSize="18" 
+                                           FontAttributes="Bold" 
+                                           TextColor="{StaticResource AccentColor}" 
+                                           VerticalOptions="Center"/>
+
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Bottom Action Button -->
+        <Border Grid.Row="2" BackgroundColor="#0A110E" Padding="20,12,20,24" StrokeThickness="0">
+            <Button Text="Add missing items to shopping list"
+                    Command="{Binding AddMissingToShoppingListCommand}"
+                    BackgroundColor="{StaticResource AccentColor}"
+                    TextColor="#0E211F"
+                    FontSize="14.5"
+                    FontAttributes="Bold"
+                    CornerRadius="16"
+                    HeightRequest="52"/>
+        </Border>
+
+    </Grid>
 </ContentPage>
