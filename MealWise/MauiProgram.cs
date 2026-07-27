@@ -52,6 +52,8 @@ public static class MauiProgram
         builder.Services.AddTransient<DiaryPage>();
         builder.Services.AddTransient<RecipePage>();
 
+        builder.Services.AddTransient<RecipeDetailsPage>();
+
 #if DEBUG
         builder.Logging.AddDebug();
 #endif

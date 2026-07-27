@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:MealWise.Models"
+             x:Class="MealWise.Views.RecipeDetailsPage"
+             BackgroundColor="#0A110E"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="BgColor">#0A110E</Color>
+            <Color x:Key="CardBgColor">#13231C</Color>
+            <Color x:Key="BorderColor">#1D362B</Color>
+            <Color x:Key="AccentColor">#C8FF4D</Color>
+            <Color x:Key="TextMutedColor">#8C9F97</Color>
+            <Color x:Key="TextColor">#FFFFFF</Color>
+
+            <Style x:Key="CardBorderStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource CardBgColor}"/>
+                <Setter Property="Stroke" Value="{StaticResource BorderColor}"/>
+                <Setter Property="StrokeThickness" Value="1"/>
+                <Setter Property="StrokeShape" Value="RoundRectangle 16"/>
+            </Style>
+
+            <Style x:Key="MacroLabelStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="TextColor" Value="{StaticResource TextMutedColor}"/>
+                <Setter Property="HorizontalOptions" Value="Center"/>
+            </Style>
+
+            <Style x:Key="MacroValueStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="TextColor" Value="{StaticResource TextColor}"/>
+                <Setter Property="HorizontalOptions" Value="Center"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto, *">
+
+        <!-- Top Header Navigation -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Padding="20,16,20,12" VerticalOptions="Center">
+            <Border Grid.Column="0"
+                    WidthRequest="38"
+                    HeightRequest="38"
+                    HorizontalOptions="Start"
+                    BackgroundColor="#1C3A34"
+                    Stroke="#2A473F"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 12"
+                    VerticalOptions="Center">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped"/>
+                </Border.GestureRecognizers>
+                <Label Text="‹"
+                       TextColor="{StaticResource TextColor}"
+                       FontSize="24"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       Margin="0,-3,0,0"/>
+            </Border>
+
+            <Label Grid.Column="1" 
+                   Text="Recipe Details" 
+                   TextColor="{StaticResource TextMutedColor}" 
+                   FontSize="14" 
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"
+                   HorizontalOptions="End"
+                   CharacterSpacing="0.8"/>
+        </Grid>
+
+        <!-- Main Content (Scrollable) -->
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <VerticalStackLayout Padding="20,8,20,24" Spacing="20">
+
+                <!-- Title & Prep Time -->
+                <VerticalStackLayout Spacing="6">
+                    <Label x:Name="RecipeTitleLabel"
+                           Text="Dish Title"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextColor}"
+                           LineHeight="1.15"/>
+
+                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                        <Label Text="⏱️" FontSize="12" VerticalOptions="Center"/>
+                        <Label x:Name="PrepTimeLabel"
+                               Text="25 minutes"
+                               FontSize="13"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource AccentColor}"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Description -->
+                <Label x:Name="DescriptionLabel"
+                       Text="Appetizing summary description goes here."
+                       FontSize="13.5"
+                       TextColor="{StaticResource TextMutedColor}"
+                       LineHeight="1.35"/>
+
+                <!-- Macro Nutritional Grid -->
+                <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
+
+                    <!-- Calories -->
+                    <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Padding="8">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="CALORIES" Style="{StaticResource MacroLabelStyle}"/>
+                            <Label x:Name="CaloriesLabel" Text="0" Style="{StaticResource MacroValueStyle}"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Protein -->
+                    <Border Grid.Column="1" Style="{StaticResource CardBorderStyle}" Padding="8">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="PROTEIN" Style="{StaticResource MacroLabelStyle}"/>
+                            <Label x:Name="ProteinLabel" Text="0g" Style="{StaticResource MacroValueStyle}"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Carbs -->
+                    <Border Grid.Column="2" Style="{StaticResource CardBorderStyle}" Padding="8">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="CARBS" Style="{StaticResource MacroLabelStyle}"/>
+                            <Label x:Name="CarbsLabel" Text="0g" Style="{StaticResource MacroValueStyle}"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Fat -->
+                    <Border Grid.Column="3" Style="{StaticResource CardBorderStyle}" Padding="8">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="FAT" Style="{StaticResource MacroLabelStyle}"/>
+                            <Label x:Name="FatLabel" Text="0g" Style="{StaticResource MacroValueStyle}"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                </Grid>
+
+                <!-- Divider -->
+                <BoxView HeightRequest="1" Color="{StaticResource BorderColor}"/>
+
+                <!-- Ingredients List -->
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="INGREDIENTS USED" 
+                           FontSize="11" 
+                           FontAttributes="Bold" 
+                           TextColor="{StaticResource TextMutedColor}" 
+                           CharacterSpacing="0.8"/>
+
+                    <VerticalStackLayout x:Name="IngredientsContainer" Spacing="8"/>
+                </VerticalStackLayout>
+
+                <!-- Divider -->
+                <BoxView HeightRequest="1" Color="{StaticResource BorderColor}"/>
+
+                <!-- Instructions Steps -->
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="PREPARATION STEPS" 
+                           FontSize="11" 
+                           FontAttributes="Bold" 
+                           TextColor="{StaticResource TextMutedColor}" 
+                           CharacterSpacing="0.8"/>
+
+                    <VerticalStackLayout x:Name="InstructionsContainer" Spacing="12"/>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

@@ -176,20 +176,14 @@ public class RecipeViewModel : INotifyPropertyChanged
     {
         if (item == null || item.ActualRecipe == null) return;
 
-        var r = item.ActualRecipe;
+        // Створюємо словник параметрів для передачі об'єкта страви
+        var navigationParameters = new Dictionary<string, object>
+    {
+        { "Recipe", item.ActualRecipe }
+    };
 
-        // Показ повної покрокової деталізації рецепту та його КБЖВ
-        string details = $"Cooking Time: {r.EstimatedTimeMinutes} minutes\n\n" +
-                         $"Nutrition (Total Portion):\n" +
-                         $"- Calories: {r.Nutrition.Calories} kcal\n" +
-                         $"- Protein: {r.Nutrition.ProteinGrams} g\n" +
-                         $"- Fat: {r.Nutrition.FatGrams} g\n" +
-                         $"- Carbs: {r.Nutrition.CarbsGrams} g\n" +
-                         $"- Fiber: {r.Nutrition.FiberGrams} g\n\n" +
-                         $"Ingredients:\n" + string.Join("\n", r.IngredientsUsed.Select(i => $"- {i}")) + "\n\n" +
-                         $"Instructions:\n" + string.Join("\n", r.Instructions);
-
-        await Shell.Current.DisplayAlert(r.Title, details, "Close");
+        // Навігація до детальної сторінки
+        await Shell.Current.GoToAsync("RecipeDetailsPage", navigationParameters);
     }
 
     private void OnToggleMissingItem(MissingIngredientItem? item)
