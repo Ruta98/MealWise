@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:MealWise.ViewModels"
              xmlns:models="clr-namespace:MealWise.Models"
+             xmlns:converters="clr-namespace:MealWise.Converters"
              x:Class="MealWise.Views.PantryPage"
              x:DataType="vm:PantryViewModel"
              BackgroundColor="#0A110E"
@@ -10,7 +11,9 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <!-- Кольорова палітра згідно з дизайном -->
+            <converters:CategoryToIconConverter x:Key="CategoryToIconConverter" />
+            <converters:UnitToAbbreviationConverter x:Key="UnitToAbbreviationConverter" />
+
             <Color x:Key="BgColor">#0A110E</Color>
             <Color x:Key="CardBgColor">#13231C</Color>
             <Color x:Key="BorderColor">#1D362B</Color>
@@ -18,7 +21,6 @@
             <Color x:Key="TextMutedColor">#8C9F97</Color>
             <Color x:Key="TextColor">#FFFFFF</Color>
 
-            <!-- Базовий стиль для карток -->
             <Style x:Key="CardBorderStyle" TargetType="Border">
                 <Setter Property="BackgroundColor" Value="{StaticResource CardBgColor}"/>
                 <Setter Property="Stroke" Value="{StaticResource BorderColor}"/>
@@ -147,9 +149,9 @@
                             <Border Style="{StaticResource CardBorderStyle}" Padding="14,12">
                                 <Grid ColumnDefinitions="Auto, *, Auto, Auto" ColumnSpacing="12" VerticalOptions="Center">
 
-                                    <!-- Emoji / Category Icon -->
+                                    <!-- Category Icon (Converted from ProductCategory) -->
                                     <Label Grid.Column="0" 
-                                           Text="{Binding Icon, FallbackValue='🥑'}" 
+                                           Text="{Binding Category, Converter={StaticResource CategoryToIconConverter}}" 
                                            FontSize="18" 
                                            VerticalOptions="Center"/>
 
@@ -166,20 +168,26 @@
                                         <Label Text="{Binding QuantityAmount}" 
                                                FontSize="12.5" 
                                                TextColor="{StaticResource TextMutedColor}"/>
-                                        <Label Text="{Binding Unit}" 
+                                        <Label Text="{Binding Unit, Converter={StaticResource UnitToAbbreviationConverter}}" 
                                                FontSize="12.5" 
                                                TextColor="{StaticResource TextMutedColor}"/>
                                     </HorizontalStackLayout>
 
-                                    <!-- Remove Action -->
-                                    <ImageButton Grid.Column="3" 
-                                                 Source="icon_close.png"
-                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PantryViewModel}}, Path=RemoveItemCommand}"
-                                                 CommandParameter="{Binding .}"
-                                                 HeightRequest="18" 
-                                                 WidthRequest="18" 
-                                                 VerticalOptions="Center"
-                                                 Opacity="0.6"/>
+                                    <!-- Remove Action via clean vector cross symbol -->
+                                    <Label Grid.Column="3" 
+                                           Text="✕" 
+                                           TextColor="{StaticResource TextMutedColor}" 
+                                           FontSize="16" 
+                                           HorizontalOptions="Center" 
+                                           VerticalOptions="Center"
+                                           Padding="6"
+                                           Opacity="0.7">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PantryViewModel}}, Path=RemoveItemCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                        </Label.GestureRecognizers>
+                                    </Label>
 
                                 </Grid>
                             </Border>

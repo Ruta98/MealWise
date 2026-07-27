@@ -144,6 +144,7 @@
                     <Label Text="Update meal" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
                     <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
 
+                        <!-- Update Weight Button -->
                         <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Padding="12">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding AddWeightCommand}"/>
@@ -154,7 +155,7 @@
                             </VerticalStackLayout>
                         </Border>
 
-                        <!-- PHOTO BUTTON (Камера / Галерея) -->
+                        <!-- PHOTO BUTTON -->
                         <Border Grid.Column="1" Style="{StaticResource CardBorderStyle}" Padding="12">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding SelectPhotoSourceCommand}"/>
@@ -165,6 +166,7 @@
                             </VerticalStackLayout>
                         </Border>
 
+                        <!-- Type text / voice prompt -->
                         <Border Grid.Column="2" Style="{StaticResource CardBorderStyle}" Padding="12">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding AddTextCommand}"/>
@@ -182,16 +184,15 @@
                 <Border Style="{StaticResource CardBorderStyle}" Padding="16" IsVisible="{Binding HasSelectedImage}">
                     <VerticalStackLayout Spacing="12">
 
-                        <!-- Статус аналізу -->
+                        <!-- Analyzing State -->
                         <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                             <ActivityIndicator IsRunning="{Binding IsAnalyzing}" IsVisible="{Binding IsAnalyzing}" Color="{StaticResource AccentColor}" HeightRequest="16" WidthRequest="16"/>
                             <Label Text="{Binding StatusText}" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextMutedColor}" VerticalOptions="Center"/>
                         </HorizontalStackLayout>
 
-                        <!-- ПЕРЕГЛЯД ЗОБРАЖЕННЯ ТА НАЗВИ -->
+                        <!-- Preview elements -->
                         <Grid ColumnDefinitions="Auto, *" ColumnSpacing="12" BackgroundColor="#0A110E" Padding="8">
                             <Border StrokeShape="RoundRectangle 10" HeightRequest="60" WidthRequest="60">
-                                <!-- Зв'язане фото -->
                                 <Image Source="{Binding SelectedImageSource}" Aspect="AspectFill"/>
                             </Border>
 
@@ -201,7 +202,7 @@
                             </VerticalStackLayout>
                         </Grid>
 
-                        <!-- Кнопки підтвердження / редагування -->
+                        <!-- Confirm or Retake -->
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                             <Button Grid.Column="0" Text="Confirm" Command="{Binding ConfirmMealCommand}"
                                     BackgroundColor="{StaticResource AccentColor}" TextColor="#0B1612" FontAttributes="Bold" CornerRadius="12"/>

@@ -1,9 +1,13 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using MealWise.Models;
 using MealWise.Services;
+using Microsoft.Maui.Controls;
 
 namespace MealWise.ViewModels;
 
@@ -62,11 +66,18 @@ public class PantryViewModel : INotifyPropertyChanged
 
     private async Task LoadDatabaseItemsAsync()
     {
-        var dbItems = await _dbService.GetPantryItemsAsync();
-        PantryItems.Clear();
-        foreach (var item in dbItems)
+        try
         {
-            PantryItems.Add(item);
+            var dbItems = await _dbService.GetPantryItemsAsync();
+            PantryItems.Clear();
+            foreach (var item in dbItems)
+            {
+                PantryItems.Add(item);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error loading database items: {ex.Message}");
         }
     }
 
@@ -88,7 +99,6 @@ public class PantryViewModel : INotifyPropertyChanged
 
         if (photoBytes == null || photoBytes.Length == 0) return;
 
-        // Позитивний фідбек: запускаємо спінер ШІ
         IsInterpreting = true;
         StatusTitle = "Analyzing your photo...";
         StatusSubtitle = "Extracting food items and portion sizes";
@@ -153,7 +163,7 @@ public class PantryViewModel : INotifyPropertyChanged
         }
     }
 
-    private void OnRemoveItem(PantryItem item)
+    private void OnRemoveItem(PantryItem? item)
     {
         if (item != null && PantryItems.Contains(item))
         {
@@ -163,11 +173,18 @@ public class PantryViewModel : INotifyPropertyChanged
 
     private async Task OnSaveToKitchenAsync()
     {
-        // ПереціловуємоSQLite БД новим складом
-        await _dbService.ClearPantryAsync();
-        await _dbService.SavePantryItemsBatchAsync(PantryItems);
+        try
+        {
+            // Перезаписуємо SQLite БД актуальним складом продуктів
+            await _dbService.ClearPantryAsync();
+            await _dbService.SavePantryItemsBatchAsync(PantryItems);
 
-        await Shell.Current.DisplayAlert("Kitchen Updated", "Your pantry stock has been saved successfully!", "OK");
+            await Shell.Current.DisplayAlert("Kitchen Updated", "Your pantry stock has been saved successfully!", "OK");
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error", $"Could not update kitchen database: {ex.Message}", "OK");
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

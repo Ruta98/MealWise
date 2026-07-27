@@ -4,21 +4,23 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using MealWise.Models;
 using MealWise.Services;
+using Microsoft.Maui.Controls;
 
 namespace MealWise.ViewModels;
 
 public class ProfileViewModel : INotifyPropertyChanged
 {
     private readonly ProfileService _profileService;
+    private readonly NutritionCalculator _nutritionCalculator;
 
-    public ProfileViewModel(ProfileService profileService)
+    public ProfileViewModel(ProfileService profileService, NutritionCalculator nutritionCalculator)
     {
         _profileService = profileService;
+        _nutritionCalculator = nutritionCalculator;
 
         SelectGenderCommand = new Command<object>(OnSelectGender);
         SelectActivityLevelCommand = new Command<object>(OnSelectActivityLevel);
         SaveCommand = new Command(OnSaveProfile);
-        BackCommand = new Command(OnBack);
 
         LoadProfile();
     }
@@ -128,7 +130,6 @@ public class ProfileViewModel : INotifyPropertyChanged
     public ICommand SelectGenderCommand { get; }
     public ICommand SelectActivityLevelCommand { get; }
     public ICommand SaveCommand { get; }
-    public ICommand BackCommand { get; }
 
     #endregion
 
@@ -183,6 +184,12 @@ public class ProfileViewModel : INotifyPropertyChanged
 
     private void OnSaveProfile()
     {
+        if (HeightCm <= 0 || WeightKg <= 0)
+        {
+            Shell.Current.DisplayAlert("Error", "Please enter valid values for height and weight.", "Ok");
+            return;
+        }
+
         var profile = _profileService.GetProfile() ?? new UserProfile();
 
         profile.DateOfBirth = DateOfBirth;
@@ -192,15 +199,12 @@ public class ProfileViewModel : INotifyPropertyChanged
         profile.DietaryRestrictions = DietaryRestrictions;
         profile.ActivityLevel = SelectedActivityLevel;
 
+        // Автоматичний розрахунок добових цілей КБЖВ на основі введених біометричних даних
+        profile.DailyTargetNutrition = _nutritionCalculator.CalculateDailyTarget(profile);
+
         _profileService.SaveProfile(profile);
 
-        Shell.Current.DisplayAlert("Success", "Profile saved successfully!", "Ok");
-    }
-
-    private void OnBack()
-    {
-        
-
+        Shell.Current.DisplayAlert("Success", "Profile saved and nutrition targets updated successfully!", "Ok");
     }
 
     #endregion

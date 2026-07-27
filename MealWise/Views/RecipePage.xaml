@@ -58,7 +58,7 @@
                    TextColor="{StaticResource TextColor}"/>
 
             <Label Text="Made from what's already in your kitchen"
-                   FontSize="12.5"
+                   FontSize="12"
                    TextColor="{StaticResource TextMutedColor}"
                    Margin="0,-4,0,0"/>
         </VerticalStackLayout>
@@ -75,13 +75,23 @@
                         Padding="14,12">
                     <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
                         <Label Text="✨" FontSize="15" VerticalOptions="Center"/>
-                        <Label Text="{Binding SummaryText, FallbackValue='Generated from 8 ingredients you have'}" 
+                        <Label Text="{Binding SummaryText, FallbackValue='Scanning kitchen stock...'}" 
                                FontSize="13" 
                                FontAttributes="Bold" 
                                TextColor="{StaticResource AccentColor}" 
                                VerticalOptions="Center"/>
                     </HorizontalStackLayout>
                 </Border>
+
+                <!-- Loading State Indicator -->
+                <ActivityIndicator IsRunning="{Binding IsGenerating}"
+                                   IsVisible="{Binding IsGenerating}"
+                                   Color="{StaticResource AccentColor}"
+                                   HeightRequest="40"
+                                   WidthRequest="40"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   Margin="0,10"/>
 
                 <!-- Recipes List -->
                 <VerticalStackLayout Spacing="10">
@@ -169,7 +179,7 @@
                                 </Border.GestureRecognizers>
                                 <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="12" VerticalOptions="Center">
 
-                                    <!-- Radio/Checkbox Circle -->
+                                    <!-- Checkbox Circle -->
                                     <Border Grid.Column="0" 
                                             WidthRequest="20" 
                                             HeightRequest="20" 
@@ -188,7 +198,7 @@
                                     <Label Grid.Column="1" 
                                            Text="{Binding Name}" 
                                            FontAttributes="Bold" 
-                                           FontSize="13.5" 
+                                           FontSize="13" 
                                            TextColor="{StaticResource TextColor}" 
                                            VerticalOptions="Center"/>
 
@@ -215,7 +225,7 @@
                     Command="{Binding AddMissingToShoppingListCommand}"
                     BackgroundColor="{StaticResource AccentColor}"
                     TextColor="#0E211F"
-                    FontSize="14.5"
+                    FontSize="14"
                     FontAttributes="Bold"
                     CornerRadius="16"
                     HeightRequest="52"/>
