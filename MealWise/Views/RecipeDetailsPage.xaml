@@ -99,7 +99,7 @@
                 <!-- Description -->
                 <Label x:Name="DescriptionLabel"
                        Text="Appetizing summary description goes here."
-                       FontSize="13.5"
+                       FontSize="13"
                        TextColor="{StaticResource TextMutedColor}"
                        LineHeight="1.35"/>
 
