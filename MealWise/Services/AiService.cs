@@ -52,18 +52,13 @@ public class AiService
     /// Generates a personalized recipe using DeepSeek LLM based on user constraints,
     /// available pantry selection, remaining nutrition budget, and historical trends.
     /// </summary>
-    public async Task<Recipe?> GenerateRecipeAsync(
+
+    public async Task<List<Recipe>?> GenerateRecipeAsync(
         UserProfile profile,
         List<PantryItem> availablePantry,
         NutritionalValue remainingNutrition,
         PeriodNutritionSummary? weeklySummary = null,
         string? userCustomPrompt = null)
-public async Task<List<Recipe>?> GenerateRecipeAsync(
-    UserProfile profile,
-    List<PantryItem> availablePantry,
-    NutritionalValue remainingNutrition,
-    PeriodNutritionSummary? weeklySummary = null,
-    string? userCustomPrompt = null)
     {
         // 1. Очищення та балансування продуктів
         var balancedPantry = _pantryFilter.GetBalancedPantrySelection(availablePantry);
