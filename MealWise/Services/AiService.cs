@@ -301,4 +301,30 @@ public class AiService
             return null;
         }
     }
+
+
+    /// <summary>
+    /// Передає поточний список продуктів разом із текстовим коригуванням користувача до ШІ для перерахунку.
+    /// </summary>
+    public async Task<List<PantryItem>> RefinePantryItemsAsync(List<PantryItem> currentItems, string correctionText)
+    {
+        if (string.IsNullOrWhiteSpace(correctionText) || currentItems == null)
+            return currentItems ?? new List<PantryItem>();
+
+        string systemPrompt = _promptBuilder.BuildPantryRefinementSystemPrompt();
+
+        // Перетворюємо поточний список у JSON-текст для контексту ШІ
+        string currentItemsJson = JsonSerializer.Serialize(currentItems, _jsonOptions);
+
+        string userPrompt = $"""
+        Current Items List in JSON:
+        {currentItemsJson}
+
+        User corrections feedback:
+        "{correctionText}"
+        """;
+
+        string jsonResponse = await SendChatCompletionAsync(systemPrompt, userPrompt);
+        return DeserializeResponse<List<PantryItem>>(jsonResponse) ?? new List<PantryItem>();
+    }
 }

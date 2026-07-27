@@ -60,7 +60,7 @@
                    TextColor="{StaticResource TextColor}"/>
 
             <Label Text="Add what's in your kitchen so we can tailor your plan."
-                   FontSize="12.5"
+                   FontSize="12"
                    TextColor="{StaticResource TextMutedColor}"
                    Margin="0,-4,0,0"/>
         </VerticalStackLayout>
@@ -121,11 +121,10 @@
                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                             <Label Text="{Binding StatusTitle, FallbackValue='Interpreting your input'}" 
                                    FontAttributes="Bold" 
-                                   FontSize="13.5" 
+                                   FontSize="13" 
                                    TextColor="{StaticResource TextColor}"/>
-                            <Label Text="{Binding StatusSubtitle, FallbackValue='We\'ll turn this into ingredients automatically'}" 
-                                   FontSize="11" 
-                                   TextColor="{StaticResource TextMutedColor}"/>
+                            <Label Text="{Binding StatusSubtitle, FallbackValue='We will turn this into ingredients automatically'}" 
+                                   FontSize="11"  TextColor="{StaticResource TextMutedColor}"/>
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
@@ -166,10 +165,10 @@
                                     <!-- Quantity & Unit -->
                                     <HorizontalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center">
                                         <Label Text="{Binding QuantityAmount}" 
-                                               FontSize="12.5" 
+                                               FontSize="12" 
                                                TextColor="{StaticResource TextMutedColor}"/>
                                         <Label Text="{Binding Unit, Converter={StaticResource UnitToAbbreviationConverter}}" 
-                                               FontSize="12.5" 
+                                               FontSize="12" 
                                                TextColor="{StaticResource TextMutedColor}"/>
                                     </HorizontalStackLayout>
 
@@ -194,8 +193,46 @@
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
+                <!-- AI Interactive Refinement Box -->
+                <Border Style="{StaticResource CardBorderStyle}" 
+        Padding="14,12" 
+        IsVisible="{Binding IsReviewingDraft}"
+        Margin="0,8,0,0">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Is this correct? Tell AI what to fix:" 
+               FontSize="12" 
+               FontAttributes="Bold" 
+               TextColor="{StaticResource TextColor}"/>
 
+                        <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                            <!-- Поле для введення невідповідностей -->
+                            <Entry Grid.Column="0" 
+                   Text="{Binding DiscrepancyText}"
+                   Placeholder="e.g. 'There is no milk, and make apples 5 pieces'"
+                   PlaceholderColor="#5A756C"
+                   TextColor="{StaticResource TextColor}"
+                   FontSize="12.5"
+                   VerticalOptions="Center"/>
+
+                            <!-- Кнопка коригування ШІ -->
+                            <Button Grid.Column="1" 
+                    Text="Fix with AI"
+                    Command="{Binding RefineWithAiCommand}"
+                    BackgroundColor="#1C3A34"
+                    TextColor="{StaticResource AccentColor}"
+                    BorderColor="{StaticResource BorderColor}"
+                    BorderWidth="1"
+                    FontSize="11"
+                    FontAttributes="Bold"
+                    CornerRadius="12"
+                    HeightRequest="36"
+                    Padding="14,0"
+                    VerticalOptions="Center"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
             </VerticalStackLayout>
+                            
         </ScrollView>
 
         <!-- Save Button Footer -->

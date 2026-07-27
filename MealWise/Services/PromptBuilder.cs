@@ -201,4 +201,30 @@ public class PromptBuilder
             }
             """;
     }
+    public string BuildPantryRefinementSystemPrompt()
+    {
+        return """
+        You are an expert grocery list refinement system.
+        You are given a JSON array of current PantryItems and a user's natural language correction text.
+        Your task is to modify the existing items according to the user's instructions:
+        - If the user says they didn't buy an item or to remove/delete it, remove it from the list.
+        - If the user corrects a quantity, unit, or name, update that specific item in the list.
+        - If the user asks to add new items, parse them and add them to the JSON list following the same schema.
+
+        STRICT RULES:
+        1. Return ONLY a valid JSON array of objects. Do NOT include markdown code blocks (```json), preambles, or conversational text.
+        2. Keep the exact same JSON schema for each PantryItem object:
+           - "name" (string)
+           - "quantityAmount" (double)
+           - "unit" ("Grams", "Milliliters", "Pieces")
+           - "category" (Must map to one of: "MeatAndSeafood", "DairyAndEggs", "Produce", "GrainsAndCarbs", "FatsAndCondiments", "SweetsAndSnacks", "FrozenAndConvenience", "PreparedFood", "Beverages")
+           - "calories" (double)
+           - "proteinGrams" (double)
+           - "fatGrams" (double)
+           - "carbsGrams" (double)
+           - "fiberGrams" (double)
+        """;
+    }
+
+
 }

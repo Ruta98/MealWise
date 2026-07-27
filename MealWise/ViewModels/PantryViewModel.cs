@@ -40,7 +40,67 @@ public class PantryViewModel : INotifyPropertyChanged
         get => _statusSubtitle;
         set { _statusSubtitle = value; OnPropertyChanged(); }
     }
+    // 1. Додайте нову властивість для тексту зворотного зв'язку
+    private string _discrepancyText = string.Empty;
+    public string DiscrepancyText
+    {
+        get => _discrepancyText;
+        set { _discrepancyText = value; OnPropertyChanged(); }
+    }
 
+    private bool _isReviewingDraft;
+    public bool IsReviewingDraft
+    {
+        get => _isReviewingDraft;
+        set { _isReviewingDraft = value; OnPropertyChanged(); }
+    }
+
+    // 2. Додайте нову команду
+    public ICommand RefineWithAiCommand { get; }
+
+    // 3. Ініціалізуйте її у конструкторі:
+    // RefineWithAiCommand = new Command(async () => await OnRefineWithAiAsync());
+
+    // 4. Реалізуйте метод OnRefineWithAiAsync:
+    private async Task OnRefineWithAiAsync()
+    {
+        if (string.IsNullOrWhiteSpace(DiscrepancyText)) return;
+
+        IsInterpreting = true;
+        StatusTitle = "Refining ingredients list...";
+        StatusSubtitle = "Shaping the list to match your corrections";
+
+        try
+        {
+            var currentItemsList = PantryItems.ToList();
+
+            // Відправляємо поточний стан + коментар користувача до ШІ
+            var refinedItems = await _aiService.RefinePantryItemsAsync(currentItemsList, DiscrepancyText);
+
+            if (refinedItems != null && refinedItems.Any())
+            {
+                PantryItems.Clear();
+                foreach (var item in refinedItems)
+                {
+                    PantryItems.Add(item);
+                }
+
+                DiscrepancyText = string.Empty; // Очищуємо поле після успішного оновлення
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert("AI Refinement", "Could not apply corrections. Please check the text and try again.", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error", $"Refinement process failed: {ex.Message}", "OK");
+        }
+        finally
+        {
+            IsInterpreting = false;
+        }
+    }
     // Команди
     public ICommand BackCommand { get; }
     public ICommand TakePhotoCommand { get; }
