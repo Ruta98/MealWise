@@ -143,6 +143,10 @@ public class PantryViewModel : INotifyPropertyChanged
 
     private async Task OnTakePhotoAsync()
     {
+        // TMP
+        await Task.CompletedTask;
+
+
         string action = await Shell.Current.DisplayActionSheet(
             "Select photo source", "Cancel", null, "Take Photo", "Choose from Gallery");
 

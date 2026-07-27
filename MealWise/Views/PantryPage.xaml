@@ -34,24 +34,7 @@
 
         <!-- Top Header & Back Button -->
         <VerticalStackLayout Grid.Row="0" Padding="20,16,20,12" Spacing="12">
-            <!-- Back Button -->
-            <Border WidthRequest="38"
-                    HeightRequest="38"
-                    HorizontalOptions="Start"
-                    BackgroundColor="#1C3A34"
-                    Stroke="#2A473F"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 12">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding BackCommand}"/>
-                </Border.GestureRecognizers>
-                <Label Text="‹"
-                       TextColor="#F3F7F3"
-                       FontSize="24"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"
-                       Margin="0,-3,0,0"/>
-            </Border>
+         
 
             <!-- Titles -->
             <Label Text="Update ingredients"
@@ -70,9 +53,9 @@
             <VerticalStackLayout Padding="20,8,20,20" Spacing="16">
 
                 <!-- Action Cards: Take Photo / Type It In -->
-                <Grid ColumnDefinitions="*, *" ColumnSpacing="12">
+                <Grid ColumnDefinitions="*" ColumnSpacing="12">
 
-                    <!-- 1. Take a Photo -->
+                    <!-- 1. Take a Photo --><!--
                     <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Padding="16">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding TakePhotoCommand}"/>
@@ -86,10 +69,10 @@
                             <Label Text="Take a photo" FontAttributes="Bold" FontSize="14" TextColor="{StaticResource TextColor}"/>
                             <Label Text="Snap your fridge or pantry" FontSize="11" TextColor="{StaticResource TextMutedColor}"/>
                         </VerticalStackLayout>
-                    </Border>
+                    </Border>-->
 
                     <!-- 2. Type It In -->
-                    <Border Grid.Column="1" Style="{StaticResource CardBorderStyle}" Padding="16">
+                    <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Padding="16">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding TypeInputCommand}"/>
                         </Border.GestureRecognizers>

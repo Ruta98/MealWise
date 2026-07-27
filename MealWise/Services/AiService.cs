@@ -58,12 +58,18 @@ public class AiService
         NutritionalValue remainingNutrition,
         PeriodNutritionSummary? weeklySummary = null,
         string? userCustomPrompt = null)
+public async Task<List<Recipe>?> GenerateRecipeAsync(
+    UserProfile profile,
+    List<PantryItem> availablePantry,
+    NutritionalValue remainingNutrition,
+    PeriodNutritionSummary? weeklySummary = null,
+    string? userCustomPrompt = null)
     {
-        // 1. Filter and balance raw pantry stock (e.g. Max 15 items: Fresh + Carbs + Spices)
+        // 1. Очищення та балансування продуктів
         var balancedPantry = _pantryFilter.GetBalancedPantrySelection(availablePantry);
         string formattedPantryText = _pantryFilter.FormatPantryForPrompt(balancedPantry);
 
-        // 2. Build system and user prompts
+        // 2. Створення запитів
         string systemPrompt = _promptBuilder.BuildRecipeSystemPrompt();
         string userPrompt = _promptBuilder.BuildRecipeUserPrompt(
             profile,
@@ -72,9 +78,11 @@ public class AiService
             weeklySummary,
             userCustomPrompt);
 
-        // 3. Call LLM API and parse result
+        // 3. Запит до ШІ та десеріалізація контейнера
         string jsonResponse = await SendChatCompletionAsync(systemPrompt, userPrompt);
-        return DeserializeResponse<Recipe>(jsonResponse);
+        var container = DeserializeResponse<RecipeSuggestionsContainer>(jsonResponse);
+
+        return container?.Suggestions;
     }
 
     // =========================================================================

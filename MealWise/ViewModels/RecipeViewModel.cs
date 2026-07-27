@@ -60,7 +60,6 @@ public class RecipeViewModel : INotifyPropertyChanged
         // Запуск генерації персоналізованого рецепта ШІ
         _ = GeneratePersonalizedRecipesAsync();
     }
-
     private async Task GeneratePersonalizedRecipesAsync()
     {
         IsGenerating = true;
@@ -74,11 +73,8 @@ public class RecipeViewModel : INotifyPropertyChanged
             var todayMeals = await _dbService.GetDailyMealsAsync(DateTime.Today);
 
             var dailyTarget = profile.DailyTargetNutrition;
-
-            // Розрахунок залишку КБЖВ на сьогодні
             var remainingNutrition = _nutritionCalculator.CalculateRemainingDailyBudget(dailyTarget, todayMeals);
 
-            // Отримання 7-денної аналітики споживання для точніших рекомендацій ШІ (наприклад, фокус на клітковині)
             var startDate = DateTime.Today.AddDays(-7);
             var endDate = DateTime.Today;
             var pastMeals = await _dbService.GetMealEntriesForPeriodAsync(startDate, endDate);
@@ -87,31 +83,34 @@ public class RecipeViewModel : INotifyPropertyChanged
             int availableCount = pantryItems.Count(i => i.QuantityAmount > 0);
             SummaryText = $"Scanning {availableCount} ingredients in your kitchen...";
 
-            // Виклик інтегрованого сервісу ШІ (DeepSeek API)
-            var generatedRecipe = await _aiService.GenerateRecipeAsync(
+            // Отримуємо відразу 3 унікальних згенерованих рецепти від ШІ
+            var generatedRecipes = await _aiService.GenerateRecipeAsync(
                 profile,
                 pantryItems,
                 remainingNutrition,
                 weeklySummary);
 
-            if (generatedRecipe != null)
+            if (generatedRecipes != null && generatedRecipes.Any())
             {
-                // Відображаємо згенеровану страву в списку рекомендованих
-                SuggestedRecipes.Add(new RecipeSuggestionItem
+                foreach (var recipe in generatedRecipes)
                 {
-                    Title = generatedRecipe.Title,
-                    CookingTimeMinutes = generatedRecipe.EstimatedTimeMinutes,
-                    IngredientsCount = generatedRecipe.IngredientsUsed.Count,
-                    MatchPercentage = CalculateMatchPercentage(generatedRecipe, pantryItems),
-                    Icon = GetRecipeIcon(generatedRecipe),
-                    ActualRecipe = generatedRecipe
-                });
+                    SuggestedRecipes.Add(new RecipeSuggestionItem
+                    {
+                        Title = recipe.Title,
+                        CookingTimeMinutes = recipe.EstimatedTimeMinutes,
+                        IngredientsCount = recipe.IngredientsUsed.Count,
+                        MatchPercentage = CalculateMatchPercentage(recipe, pantryItems),
+                        Icon = GetRecipeIcon(recipe),
+                        ActualRecipe = recipe
+                    });
+                }
 
-                SummaryText = $"Custom recipe generated from your stock!";
+                SummaryText = $"Generated 3 customized recipes for your target!";
 
-                // Порівнюємо інгредієнти рецепта з коморою, щоб виявити відсутні продукти
+                // Збираємо відсутні інгредієнти з першого (рекомендованого) рецепту
+                var firstRecipe = generatedRecipes.First();
                 var pantryNames = pantryItems.Select(p => p.Name.ToLower().Trim()).ToList();
-                foreach (var ingredientNeeded in generatedRecipe.IngredientsUsed)
+                foreach (var ingredientNeeded in firstRecipe.IngredientsUsed)
                 {
                     bool isAvailable = pantryNames.Any(pName => ingredientNeeded.ToLower().Contains(pName));
                     if (!isAvailable)

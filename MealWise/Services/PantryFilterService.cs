@@ -27,7 +27,6 @@ public class PantryFilterService
         if (allItems == null || !allItems.Any())
             return new List<PantryItem>();
 
-        // 1. Filter out items with 0 quantity and non-cooking categories
         var cookingEligibleItems = allItems
             .Where(item => item.QuantityAmount > 0)
             .Where(item => item.Category != ProductCategory.SweetsAndSnacks &&
@@ -35,30 +34,28 @@ public class PantryFilterService
                            item.Category != ProductCategory.PreparedFood)
             .ToList();
 
-        // 2. Select fresh perishable items (Meat, Produce, Dairy) - highest usage priority
+        // Сортуємо швидкопсувні продукти за зростанням дати додавання (AddedDate):
+        // Найдавніші продукти (які були додані першими) опиняться зверху списку.
         var perishables = cookingEligibleItems
             .Where(item => item.Category == ProductCategory.MeatAndSeafood ||
                            item.Category == ProductCategory.Produce ||
                            item.Category == ProductCategory.DairyAndEggs ||
                            item.Category == ProductCategory.FrozenAndConvenience)
-            .OrderByDescending(item => item.AddedDate)
+            .OrderBy(item => item.AddedDate) // Вхідний контроль: старіші продукти мають вищий пріоритет
             .Take(maxPerishables)
             .ToList();
 
-        // 3. Select staple carbohydrates (Grains, Pasta, Flour)
         var carbs = cookingEligibleItems
             .Where(item => item.Category == ProductCategory.GrainsAndCarbs)
-            .OrderByDescending(item => item.AddedDate)
+            .OrderBy(item => item.AddedDate)
             .Take(maxCarbs)
             .ToList();
 
-        // 4. Select condiments, cooking fats, and spices
         var condiments = cookingEligibleItems
             .Where(item => item.Category == ProductCategory.FatsAndCondiments)
             .Take(maxCondiments)
             .ToList();
 
-        // 5. Merge into a distinct balanced list
         return perishables
             .Concat(carbs)
             .Concat(condiments)
@@ -78,7 +75,6 @@ public class PantryFilterService
         var sb = new StringBuilder();
         sb.AppendLine("Available Pantry Ingredients:");
 
-        // Group items by category to give structural context to the LLM
         var grouped = items.GroupBy(i => GetCategoryGroupHeader(i.Category));
 
         foreach (var group in grouped)
@@ -86,12 +82,18 @@ public class PantryFilterService
             sb.AppendLine($"\n[{group.Key}]:");
             foreach (var item in group)
             {
-                sb.AppendLine($"- {item.Name}: {item.QuantityAmount} {item.Unit}");
+                // Якщо продукт перебуває в коморі понад 3 дні, позначаємо його маркуванням терміновості
+                var daysInPantry = (DateTime.Now - item.AddedDate).TotalDays;
+                string freshnessWarning = daysInPantry >= 3.0 ? " [Nearing Expiration - USE FIRST]" : "";
+
+                sb.AppendLine($"- {item.Name}: {item.QuantityAmount} {item.Unit}{freshnessWarning}");
             }
         }
 
         return sb.ToString();
     }
+
+   
 
     /// <summary>
     /// Maps ProductCategory enum values to clear, descriptive section headers for the LLM.
